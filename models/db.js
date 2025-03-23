@@ -17,9 +17,7 @@ try {
     default:
       throw new Error(`Unsupported DB_TYPE: ${DB_TYPE}`);
   }
-  console.log(`✅ Using database: ${DB_TYPE}`);
 } catch (error) {
-  console.error(`❌ Database connection error: ${error.message}`);
   process.exit(1);
 }
 
