@@ -112,7 +112,6 @@ const addDoctor = async (req, res) => {
   }
 };
 
-
 const addProvider = async (req, res) => {
   const {
     Name,
@@ -191,5 +190,46 @@ const addPatientHistory = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  const { Email, password, type } = decryptData(req.body.salt, req.body.data);
 
-module.exports = { addPatient, addDoctor, addProvider, addPatientHistory };
+  if (!Email || !password) {
+    return res.status(400).json({ error: "Email and password are required." });
+  }
+
+  try {
+    let tableName;
+    if (type === 1) {
+      tableName = "Doctors";
+    } else if (type === 2) {
+      tableName = "Patients";
+    } else if (type === 3) {
+      tableName = "Providers";
+    } else {
+      return res.status(400).json({ error: "Invalid user type." });
+    }
+    const query = `
+      SELECT id, password_hash FROM ${tableName} WHERE Email = ?
+    `;
+
+    const [rows] = await db.query(query, [Email]);
+
+    if (rows.length === 0) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    const user = rows[0];
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    res.status(200).json({ message: "Login successful", userId: user.id });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to login", details: error.message });
+  }
+};
+
+
+module.exports = { addPatient, addDoctor, addProvider, login, addPatientHistory };
