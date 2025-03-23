@@ -10,7 +10,7 @@ const {
   authenticatePartner,
   verifyToken,
 } = require("../controllers/authController");
-const { addPatient, addDoctor,addProvider,addPatientHistory } = require("../controllers/userController");
+const { addPatient, addDoctor, addProvider, addPatientHistory } = require("../controllers/userController");
 
 router.post("/admin/addpartner", validateRequest, addPartner);
 router.post("/authenticate", validateRequest, authenticatePartner);
